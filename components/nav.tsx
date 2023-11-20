@@ -149,7 +149,7 @@ export default function Nav({ children }: { children: ReactNode }) {
               className="rounded-lg p-2 hover:bg-stone-200 dark:hover:bg-stone-700"
             >
               <Image
-                src="/logo.png"
+                src="/logo-allblack.png"
                 width={24}
                 height={24}
                 alt="Logo"

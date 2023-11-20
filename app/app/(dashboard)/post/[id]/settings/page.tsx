@@ -41,6 +41,19 @@ export default async function PostSettings({
           handleSubmit={updatePostMetadata}
         />
 
+      <Form
+          title="Content Type"
+          description="The slug is the URL-friendly version of the name. It is usually all lowercase and contains only letters, numbers, and hyphens."
+          helpText="Please use a slug that is unique to this post."
+          inputAttrs={{
+            name: "content",
+            type: "text",
+            defaultValue: data?.slug!,
+            placeholder: "Content Type",
+          }}
+          handleSubmit={updatePostMetadata}
+        />
+
         <Form
           title="Thumbnail image"
           description="The thumbnail image for your post. Accepted formats: .png, .jpg, .jpeg"

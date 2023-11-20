@@ -84,7 +84,18 @@ export default function Form({
               <option value="font-work">Work Sans</option>
             </select>
           </div>
-        ) : inputAttrs.name === "subdomain" ? (
+        ) : inputAttrs.name === "content" ? (
+          <div className="flex max-w-sm items-center overflow-hidden rounded-lg border border-stone-600">
+            <select
+              name="content"
+              defaultValue={inputAttrs.defaultValue}
+              className="w-full rounded-none border-none bg-white px-4 py-2 text-sm font-medium text-stone-700 focus:outline-none focus:ring-black dark:bg-black dark:text-stone-200 dark:focus:ring-white"
+            >
+              <option value="blog">Blog</option>
+              <option value="page">Static Page</option>
+            </select>
+          </div>
+        ): inputAttrs.name === "subdomain" ? (
           <div className="flex w-full max-w-md">
             <input
               {...inputAttrs}

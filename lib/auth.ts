@@ -1,6 +1,9 @@
 import { getServerSession, type NextAuthOptions } from "next-auth";
 import GitHubProvider from "next-auth/providers/github";
+import CredentialsProvider from "next-auth/providers/credentials"
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import bcrypt from 'bcrypt'
+
 import prisma from "@/lib/prisma";
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL;
@@ -20,6 +23,46 @@ export const authOptions: NextAuthOptions = {
         };
       },
     }),
+    CredentialsProvider({
+      // The name to display on the sign in form (e.g. 'Sign in with...')
+      name: 'Credentials',
+      // The credentials is used to generate a suitable form on the sign in page.
+      // You can specify whatever fields you are expecting to be submitted.
+      // e.g. domain, username, password, 2FA token, etc.
+      // You can pass any HTML attribute to the <input> tag through the object.
+      credentials: {
+        password: { label: "Password", type: "password" },
+        email: {label: "Email", type: "email"}
+      },
+      async authorize(credentials, req) {
+        // You need to provide your own logic here that takes the credentials
+        // submitted and returns either a object representing a user or value
+        // that is false/null if the credentials are invalid.
+        // e.g. return { id: 1, name: 'J Smith', email: 'jsmith@example.com' }
+        // You can also use the `req` object to obtain additional parameters
+        // (i.e., the request IP address)
+
+        if(!credentials?.email || !credentials.password){ console.log(credentials); return null }
+
+        const user = await prisma.user.findUnique({
+          where: {
+            email: credentials.email
+          }
+        });
+
+        if (!user){ console.log(user); return null}
+        if ( !user.hashPassword){ console.log('no password'); return null}
+
+        const chkPassword = await bcrypt.compare(credentials.password, user.hashPassword)
+    
+        // If no error and we have user data, return it
+        if (!chkPassword) {
+          console.log('incorrect password'); return null
+        }
+        // Return null if user data could not be retrieved
+        return user
+      }
+    })
   ],
   pages: {
     signIn: `/login`,
@@ -27,6 +70,7 @@ export const authOptions: NextAuthOptions = {
     error: "/login", // Error code passed in query string as ?error=
   },
   adapter: PrismaAdapter(prisma),
+
   session: { strategy: "jwt" },
   cookies: {
     sessionToken: {
@@ -69,6 +113,7 @@ export function getSession() {
       id: string;
       name: string;
       username: string;
+      hashpassword: string;
       email: string;
       image: string;
     };
